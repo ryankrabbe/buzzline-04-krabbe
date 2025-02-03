@@ -1,0 +1,23 @@
+2025-02-02 16:27:00.139 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-02 16:27:00.141 | INFO     | __main__:<module>:50 - Project root: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe
+2025-02-02 16:27:00.141 | INFO     | __main__:<module>:54 - Data folder: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data
+2025-02-02 16:27:00.141 | INFO     | __main__:<module>:58 - Data file: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data\buzz_live.json
+2025-02-02 16:27:00.142 | INFO     | __main__:main:125 - START producer...
+2025-02-02 16:27:00.142 | INFO     | __main__:main:126 - Hit CTRL c (or CMD c) to close.
+2025-02-02 16:27:00.142 | INFO     | __main__:get_message_interval:40 - Message interval: 3 seconds
+2025-02-02 16:27:00.143 | INFO     | __main__:main:134 - {'message': 'I just found a movie! It was boring.', 'author': 'Charlie'}
+2025-02-02 16:27:03.144 | INFO     | __main__:main:134 - {'message': 'I just saw a movie! It was funny.', 'author': 'Bob'}
+2025-02-02 16:27:03.907 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-02 16:27:03.908 | INFO     | __main__:<module>:38 - Project root: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe
+2025-02-02 16:27:03.908 | INFO     | __main__:<module>:39 - Data folder: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data
+2025-02-02 16:27:03.908 | INFO     | __main__:<module>:40 - Data file: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data\buzz_live.json
+2025-02-02 16:27:05.161 | INFO     | __main__:main:155 - START consumer.
+2025-02-02 16:27:06.145 | INFO     | __main__:main:134 - {'message': 'I just tried an app! It was funny.', 'author': 'Alice'}
+2025-02-02 16:27:06.171 | INFO     | __main__:process_message:115 - Processed JSON message: {'message': 'I just tried an app! It was funny.', 'author': 'Alice'}
+2025-02-02 16:27:06.171 | INFO     | __main__:process_message:121 - Message received from author: Alice
+2025-02-02 16:27:06.171 | INFO     | __main__:process_message:127 - Updated author counts: {'Alice': 1}
+2025-02-02 16:27:06.334 | INFO     | __main__:process_message:133 - Chart updated successfully for message: {"message": "I just tried an app! It was funny.", "author": "Alice"}
+
+2025-02-02 16:27:08.023 | WARNING  | __main__:main:139 - Producer interrupted by user.
+2025-02-02 16:27:08.023 | INFO     | __main__:main:143 - Producer shutting down.
+2025-02-02 16:27:08.803 | INFO     | __main__:main:186 - Consumer interrupted by user.
