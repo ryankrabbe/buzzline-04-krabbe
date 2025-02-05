@@ -21,6 +21,7 @@ import sys
 import time
 import pathlib  # work with file paths
 import json  # work with JSON data
+import random
 
 # Import external packages
 from dotenv import load_dotenv
@@ -53,7 +54,7 @@ def get_kafka_topic() -> str:
 
 def get_message_interval() -> int:
     """Fetch message interval from environment or use default."""
-    interval = int(os.getenv("BUZZ_INTERVAL_SECONDS", 1))
+    interval = int(os.getenv("MATCH_INTERVAL_SECONDS", 3))
     logger.info(f"Message interval: {interval} seconds")
     return interval
 
@@ -72,52 +73,55 @@ DATA_FOLDER: pathlib.Path = PROJECT_ROOT.joinpath("data")
 logger.info(f"Data folder: {DATA_FOLDER}")
 
 # Set the name of the data file
-DATA_FILE: pathlib.Path = DATA_FOLDER.joinpath("buzz.json")
+DATA_FILE: pathlib.Path = DATA_FOLDER.joinpath("project.json")
 logger.info(f"Data file: {DATA_FILE}")
 
 #####################################
-# Message Generator
+# Soccer Match Generator
 #####################################
 
+# Teams for Matches
+TEAMS = [
+    "Manchester United",
+    "Chelsea",
+    "Liverpool",
+    "Arsenal",
+    "Manchester City",
+    "Tottenham",
+    "Newcastle United",
+    "Aston Villa",
+    "West Ham",
+    "Brighton",
+]
 
-def generate_messages(file_path: pathlib.Path):
+def generate_match_event():
     """
-    Read from a JSON file and yield them one by one, continuously.
+    Generate a random soccer match event.
 
-    Args:
-        file_path (pathlib.Path): Path to the JSON file.
-
-    Yields:
-        dict: A dictionary containing the JSON data.
+    Returns:
+        dict: A dictionary containing match details.
     """
-    while True:
-        try:
-            logger.info(f"Opening data file in read mode: {DATA_FILE}")
-            with open(DATA_FILE, "r") as json_file:
-                logger.info(f"Reading data from file: {DATA_FILE}")
+    home_team, away_team = random.sample(TEAMS, 2)
+    home_possession = random.randint(40, 60)
+    away_possession = 100 - home_possession
 
-                # Load the JSON file as a list of dictionaries
-                json_data: list = json.load(json_file)
+    match_data = {
+        "match_id": random.randint(100, 999),
+        "date": time.strftime("%Y-%m-%d"),
+        "home_team": home_team,
+        "away_team": away_team,
+        "home_goals": random.randint(0, 5),
+        "away_goals": random.randint(0, 5),
+        "home_possession": home_possession,
+        "away_possession": away_possession,
+        "home_shots": random.randint(5, 20),
+        "away_shots": random.randint(5, 20),
+        "home_fouls": random.randint(5, 15),
+        "away_fouls": random.randint(5, 15),
+    }
 
-                if not isinstance(json_data, list):
-                    raise ValueError(
-                        f"Expected a list of JSON objects, got {type(json_data)}."
-                    )
-
-                # Iterate over the entries in the JSON file
-                for buzz_entry in json_data:
-                    logger.debug(f"Generated JSON: {buzz_entry}")
-                    yield buzz_entry
-        except FileNotFoundError:
-            logger.error(f"File not found: {file_path}. Exiting.")
-            sys.exit(1)
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON format in file: {file_path}. Error: {e}")
-            sys.exit(2)
-        except Exception as e:
-            logger.error(f"Unexpected error in message generation: {e}")
-            sys.exit(3)
-
+    logger.debug(f"Generated match event: {match_data}")
+    return match_data
 
 #####################################
 # Main Function
@@ -130,10 +134,10 @@ def main():
 
     - Ensures the Kafka topic exists.
     - Creates a Kafka producer using the `create_kafka_producer` utility.
-    - Streams generated JSON messages to the Kafka topic.
+    - Streams generated soccer match JSON messages to the Kafka topic.
     """
 
-    logger.info("START producer.")
+    logger.info("START soccer match producer.")
     verify_services()
 
     # fetch .env content
@@ -161,23 +165,23 @@ def main():
         logger.error(f"Failed to create or verify topic '{topic}': {e}")
         sys.exit(1)
 
-    # Generate and send messages
-    logger.info(f"Starting message production to topic '{topic}'...")
+    # Generate and send match events
+    logger.info(f"Starting soccer match production to topic '{topic}'...")
     try:
-        for message_dict in generate_messages(DATA_FILE):
-            # Send message directly as a dictionary (producer handles serialization)
-            producer.send(topic, value=message_dict)
-            logger.info(f"Sent message to topic '{topic}': {message_dict}")
+        while True:
+            match_event = generate_match_event()
+            producer.send(topic, value=match_event)
+            logger.info(f"Sent match event to topic '{topic}': {match_event}")
             time.sleep(interval_secs)
     except KeyboardInterrupt:
         logger.warning("Producer interrupted by user.")
     except Exception as e:
-        logger.error(f"Error during message production: {e}")
+        logger.error(f"Error during match event production: {e}")
     finally:
         producer.close()
         logger.info("Kafka producer closed.")
 
-    logger.info("END producer.")
+    logger.info("END soccer match producer.")
 
 
 #####################################
