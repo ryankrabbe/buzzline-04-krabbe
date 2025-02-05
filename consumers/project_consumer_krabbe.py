@@ -20,10 +20,13 @@ Example JSON message (after deserialization) to be analyzed
 # Import packages from Python Standard Library
 import os
 import json  # handle JSON parsing
+import collections
 from collections import defaultdict  # data structure for counting author occurrences
+import sys
 
 # Import external packages
 from dotenv import load_dotenv
+from kafka import KafkaConsumer
 
 # IMPORTANT
 # Import Matplotlib.pyplot for live plotting
@@ -48,14 +51,14 @@ load_dotenv()
 
 def get_kafka_topic() -> str:
     """Fetch Kafka topic from environment or use default."""
-    topic = os.getenv("BUZZ_TOPIC", "unknown_topic")
+    topic = os.getenv("SOCCER_MATCH_TOPIC", "soccer_matches")
     logger.info(f"Kafka topic: {topic}")
     return topic
 
 
-def get_kafka_consumer_group_id() -> str:
+def get_kafka_group_id() -> str:
     """Fetch Kafka consumer group id from environment or use default."""
-    group_id: str = os.getenv("BUZZ_CONSUMER_GROUP_ID", "default_group")
+    group_id: str = os.getenv("SOCCER_CONSUMER_GROUP", "soccer_group_1")
     logger.info(f"Kafka consumer group id: {group_id}")
     return group_id
 
@@ -69,7 +72,7 @@ author_counts = defaultdict(int)
 
 #####################################
 # Set up live visuals
-#####################################
+match_stats = collections.defaultdict(lambda: {"matches": 0, "goals": 0, "shots": 0, "fouls": 0})
 
 # Use the subplots() method to create a tuple containing
 # two objects at once:
@@ -122,51 +125,31 @@ def update_chart():
 
 
 #####################################
-# Function to process a single message
+# Function to process a match event
 # #####################################
 
 
-def process_message(message: str) -> None:
+def process_match_event(match_event):
     """
-    Process a single JSON message from Kafka and update the chart.
+    Process an incoming soccer match event.
 
     Args:
-        message (str): The JSON message as a string.
+        match_event (dict): The match event data.
     """
-    try:
-        # Log the raw message for debugging
-        logger.debug(f"Raw message: {message}")
+    home_team = match_event["home_team"]
+    away_team = match_event["away_team"]
 
-        # Parse the JSON string into a Python dictionary
-        message_dict: dict = json.loads(message)
+    # Update stats for both teams
+    for team, goals, shots, fouls in [
+        (home_team, match_event["home_goals"], match_event["home_shots"], match_event["home_fouls"]),
+        (away_team, match_event["away_goals"], match_event["away_shots"], match_event["away_fouls"]),
+    ]:
+        match_stats[team]["matches"] += 1
+        match_stats[team]["goals"] += goals
+        match_stats[team]["shots"] += shots
+        match_stats[team]["fouls"] += fouls
 
-        # Ensure the processed JSON is logged for debugging
-        logger.info(f"Processed JSON message: {message_dict}")
-
-        # Ensure it's a dictionary before accessing fields
-        if isinstance(message_dict, dict):
-            # Extract the 'author' field from the Python dictionary
-            author = message_dict.get("author", "unknown")
-            logger.info(f"Message received from author: {author}")
-
-            # Increment the count for the author
-            author_counts[author] += 1
-
-            # Log the updated counts
-            logger.info(f"Updated author counts: {dict(author_counts)}")
-
-            # Update the chart
-            update_chart()
-
-            # Log the updated chart
-            logger.info(f"Chart updated successfully for message: {message}")
-        else:
-            logger.error(f"Expected a dictionary but got: {type(message_dict)}")
-
-    except json.JSONDecodeError:
-        logger.error(f"Invalid JSON message: {message}")
-    except Exception as e:
-        logger.error(f"Error processing message: {e}")
+    logger.info(f"Updated stats: {team} -> {match_stats[team]}")
 
 
 #####################################
@@ -178,38 +161,42 @@ def main() -> None:
     """
     Main entry point for the consumer.
 
-    - Reads the Kafka topic name and consumer group ID from environment variables.
-    - Creates a Kafka consumer using the `create_kafka_consumer` utility.
-    - Polls messages and updates a live chart.
+    - Listens for soccer match messages from Kafka.
+    - Processes the match events in real-time.
     """
-    logger.info("START consumer.")
+    logger.info("START soccer match consumer.")
 
     # fetch .env content
     topic = get_kafka_topic()
-    group_id = get_kafka_consumer_group_id()
-    logger.info(f"Consumer: Topic '{topic}' and group '{group_id}'...")
+    group_id = get_kafka_group_id()
 
-    # Create the Kafka consumer using the helpful utility function.
-    consumer = create_kafka_consumer(topic, group_id)
+    # Create the Kafka consumer
+    try:
+        consumer = KafkaConsumer(
+            topic,
+            group_id=group_id,
+            bootstrap_servers=os.getenv("KAFKA_BROKER", "localhost:9092"),
+            value_deserializer=lambda x: json.loads(x.decode("utf-8")),
+        )
+        logger.info(f"Listening for messages on topic '{topic}'...")
+    except Exception as e:
+        logger.error(f"Failed to create Kafka consumer: {e}")
+        sys.exit(1)
 
-    # Poll and process messages
-    logger.info(f"Polling messages from topic '{topic}'...")
     try:
         for message in consumer:
-            # message is a complex object with metadata and value
-            # Use the value attribute to extract the message as a string
-            message_str = message.value
-            logger.debug(f"Received message at offset {message.offset}: {message_str}")
-            process_message(message_str)
+            match_event = message.value
+            logger.info(f"Received match event: {match_event}")
+            process_match_event(match_event)
     except KeyboardInterrupt:
         logger.warning("Consumer interrupted by user.")
     except Exception as e:
-        logger.error(f"Error while consuming messages: {e}")
+        logger.error(f"Error during message consumption: {e}")
     finally:
         consumer.close()
-        logger.info(f"Kafka consumer for topic '{topic}' closed.")
+        logger.info("Kafka consumer closed.")
 
-    logger.info(f"END consumer for topic '{topic}' and group '{group_id}'.")
+    logger.info("END soccer match consumer.")
 
 
 #####################################
@@ -217,12 +204,4 @@ def main() -> None:
 #####################################
 
 if __name__ == "__main__":
-
-    # Call the main function to start the consumer
     main()
-
-    # Turn off interactive mode after completion
-    plt.ioff()  
-
-    # Display the final chart
-    plt.show()
