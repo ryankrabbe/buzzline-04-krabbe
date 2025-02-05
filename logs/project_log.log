@@ -1053,3 +1053,49 @@
 2025-02-05 08:56:47.123 | WARNING  | __main__:main:192 - Consumer interrupted by user.
 2025-02-05 08:56:47.128 | INFO     | __main__:main:197 - Kafka consumer closed.
 2025-02-05 08:56:47.128 | INFO     | __main__:main:199 - END soccer match consumer.
+2025-02-05 09:04:33.612 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-05 09:04:33.616 | INFO     | __main__:<module>:69 - Project root: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe
+2025-02-05 09:04:33.616 | INFO     | __main__:<module>:73 - Data folder: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data
+2025-02-05 09:04:33.616 | INFO     | __main__:<module>:77 - Data file: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data\project.json
+2025-02-05 09:04:33.616 | INFO     | __main__:main:140 - START soccer match producer.
+2025-02-05 09:04:33.616 | INFO     | utils.utils_producer:get_zookeeper_address:57 - Zookeeper address: localhost:2181
+2025-02-05 09:04:33.623 | INFO     | utils.utils_producer:check_zookeeper_service_is_ready:79 - Zookeeper is ready at localhost:2181.
+2025-02-05 09:04:33.624 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-05 09:04:33.940 | INFO     | utils.utils_producer:check_kafka_service_is_ready:98 - Kafka is ready. Brokers: {'throttle_time_ms': 0, 'brokers': [{'node_id': 0, 'host': 'localhost', 'port': 9092, 'rack': None}], 'cluster_id': 'IwjRkHOfS--7GecCUrZpKQ', 'controller_id': 0}
+2025-02-05 09:04:33.941 | INFO     | __main__:get_kafka_topic:51 - Kafka topic: soccer_matches
+2025-02-05 09:04:33.941 | INFO     | __main__:get_message_interval:58 - Message interval: 3 seconds
+2025-02-05 09:04:33.942 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-05 09:04:33.942 | INFO     | utils.utils_producer:create_kafka_producer:146 - Connecting to Kafka broker at localhost:9092...
+2025-02-05 09:04:34.047 | INFO     | utils.utils_producer:create_kafka_producer:151 - Kafka producer successfully created.
+2025-02-05 09:04:34.049 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-05 09:04:34.364 | INFO     | utils.utils_producer:create_kafka_topic:172 - Topic 'soccer_matches' already exists. Clearing it out...
+2025-02-05 09:04:34.365 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-05 09:04:34.682 | ERROR    | utils.utils_producer:clear_kafka_topic:235 - Error managing retention for topic 'soccer_matches': list indices must be integers or slices, not ConfigResource
+2025-02-05 09:04:34.683 | INFO     | __main__:main:163 - Kafka topic 'soccer_matches' is ready.
+2025-02-05 09:04:34.683 | INFO     | __main__:main:169 - Starting soccer match production to topic 'soccer_matches'...
+2025-02-05 09:04:34.684 | INFO     | __main__:main:174 - Sent match event to topic 'soccer_matches': {'match_id': 738, 'date': '2025-02-05', 'home_team': 'West Ham', 'away_team': 'Newcastle United', 'home_goals': 4, 'away_goals': 5, 'home_possession': 48, 'away_possession': 52, 'home_shots': 20, 'away_shots': 18, 'home_fouls': 5, 'away_fouls': 15}
+2025-02-05 09:04:36.990 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-05 09:04:37.145 | INFO     | __main__:main:167 - START soccer match consumer.
+2025-02-05 09:04:37.146 | INFO     | __main__:get_kafka_topic:55 - Kafka topic: soccer_matches
+2025-02-05 09:04:37.146 | INFO     | __main__:get_kafka_group_id:62 - Kafka consumer group id: soccer_group_1
+2025-02-05 09:04:37.257 | INFO     | __main__:main:181 - Listening for messages on topic 'soccer_matches'...
+2025-02-05 09:04:37.570 | INFO     | __main__:main:189 - Received match event: {'match_id': 738, 'date': '2025-02-05', 'home_team': 'West Ham', 'away_team': 'Newcastle United', 'home_goals': 4, 'away_goals': 5, 'home_possession': 48, 'away_possession': 52, 'home_shots': 20, 'away_shots': 18, 'home_fouls': 5, 'away_fouls': 15}
+2025-02-05 09:04:37.571 | INFO     | __main__:process_match_event:152 - Updated stats: Newcastle United -> {'matches': 1, 'goals': 5, 'shots': 18, 'fouls': 15}
+2025-02-05 09:04:37.687 | INFO     | __main__:main:174 - Sent match event to topic 'soccer_matches': {'match_id': 497, 'date': '2025-02-05', 'home_team': 'Liverpool', 'away_team': 'West Ham', 'home_goals': 0, 'away_goals': 2, 'home_possession': 40, 'away_possession': 60, 'home_shots': 5, 'away_shots': 8, 'home_fouls': 9, 'away_fouls': 15}
+2025-02-05 09:04:37.689 | INFO     | __main__:main:189 - Received match event: {'match_id': 497, 'date': '2025-02-05', 'home_team': 'Liverpool', 'away_team': 'West Ham', 'home_goals': 0, 'away_goals': 2, 'home_possession': 40, 'away_possession': 60, 'home_shots': 5, 'away_shots': 8, 'home_fouls': 9, 'away_fouls': 15}
+2025-02-05 09:04:37.690 | INFO     | __main__:process_match_event:152 - Updated stats: West Ham -> {'matches': 2, 'goals': 6, 'shots': 28, 'fouls': 20}
+2025-02-05 09:04:40.688 | INFO     | __main__:main:174 - Sent match event to topic 'soccer_matches': {'match_id': 696, 'date': '2025-02-05', 'home_team': 'Tottenham', 'away_team': 'West Ham', 'home_goals': 4, 'away_goals': 5, 'home_possession': 41, 'away_possession': 59, 'home_shots': 5, 'away_shots': 5, 'home_fouls': 10, 'away_fouls': 14}
+2025-02-05 09:04:40.691 | INFO     | __main__:main:189 - Received match event: {'match_id': 696, 'date': '2025-02-05', 'home_team': 'Tottenham', 'away_team': 'West Ham', 'home_goals': 4, 'away_goals': 5, 'home_possession': 41, 'away_possession': 59, 'home_shots': 5, 'away_shots': 5, 'home_fouls': 10, 'away_fouls': 14}
+2025-02-05 09:04:40.692 | INFO     | __main__:process_match_event:152 - Updated stats: West Ham -> {'matches': 3, 'goals': 11, 'shots': 33, 'fouls': 34}
+2025-02-05 09:04:43.690 | INFO     | __main__:main:174 - Sent match event to topic 'soccer_matches': {'match_id': 793, 'date': '2025-02-05', 'home_team': 'West Ham', 'away_team': 'Arsenal', 'home_goals': 2, 'away_goals': 4, 'home_possession': 47, 'away_possession': 53, 'home_shots': 18, 'away_shots': 14, 'home_fouls': 13, 'away_fouls': 11}
+2025-02-05 09:04:43.693 | INFO     | __main__:main:189 - Received match event: {'match_id': 793, 'date': '2025-02-05', 'home_team': 'West Ham', 'away_team': 'Arsenal', 'home_goals': 2, 'away_goals': 4, 'home_possession': 47, 'away_possession': 53, 'home_shots': 18, 'away_shots': 14, 'home_fouls': 13, 'away_fouls': 11}
+2025-02-05 09:04:43.693 | INFO     | __main__:process_match_event:152 - Updated stats: Arsenal -> {'matches': 1, 'goals': 4, 'shots': 14, 'fouls': 11}
+2025-02-05 09:04:46.693 | INFO     | __main__:main:174 - Sent match event to topic 'soccer_matches': {'match_id': 330, 'date': '2025-02-05', 'home_team': 'Liverpool', 'away_team': 'Manchester City', 'home_goals': 4, 'away_goals': 5, 'home_possession': 53, 'away_possession': 47, 'home_shots': 11, 'away_shots': 8, 'home_fouls': 6, 'away_fouls': 14}
+2025-02-05 09:04:46.695 | INFO     | __main__:main:189 - Received match event: {'match_id': 330, 'date': '2025-02-05', 'home_team': 'Liverpool', 'away_team': 'Manchester City', 'home_goals': 4, 'away_goals': 5, 'home_possession': 53, 'away_possession': 47, 'home_shots': 11, 'away_shots': 8, 'home_fouls': 6, 'away_fouls': 14}
+2025-02-05 09:04:46.695 | INFO     | __main__:process_match_event:152 - Updated stats: Manchester City -> {'matches': 1, 'goals': 5, 'shots': 8, 'fouls': 14}
+2025-02-05 09:04:48.437 | WARNING  | __main__:main:177 - Producer interrupted by user.
+2025-02-05 09:04:48.439 | INFO     | __main__:main:182 - Kafka producer closed.
+2025-02-05 09:04:48.439 | INFO     | __main__:main:184 - END soccer match producer.
+2025-02-05 09:04:49.381 | WARNING  | __main__:main:192 - Consumer interrupted by user.
+2025-02-05 09:04:49.386 | INFO     | __main__:main:197 - Kafka consumer closed.
+2025-02-05 09:04:49.386 | INFO     | __main__:main:199 - END soccer match consumer.

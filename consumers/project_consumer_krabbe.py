@@ -95,24 +95,33 @@ def update_chart():
     # Clear the previous chart
     ax.clear()
 
-    # Get the authors and counts from the dictionary
-    authors_list = list(author_counts.keys())
-    counts_list = list(author_counts.values())
+    # Get the teams and counts from the dictionary
+    teams = list(match_stats.keys())
+    goals = [match_stats[team]["goals"] for team in teams]
+    shots = [match_stats[team]["shots"] for team in teams]
+    fouls = [match_stats[team]["fouls"] for team in teams]
+
+    bar_width = 0.25
+    x_positions = range(len(teams))
 
     # Create a bar chart using the bar() method.
     # Pass in the x list, the y list, and the color
-    ax.bar(authors_list, counts_list, color="skyblue")
+    ax.bar(x_positions, goals, width=bar_width, label="Goals", color="green")
+    ax.bar([x + bar_width for x in x_positions], shots, width=bar_width, label="Shots", color="blue")
+    ax.bar([x + 2 * bar_width for x in x_positions], fouls, width=bar_width, label="Fouls", color="red")
 
     # Use the built-in axes methods to set the labels and title
-    ax.set_xlabel("Authors")
-    ax.set_ylabel("Message Counts")
-    ax.set_title("Real-Time Author Message Counts - Ryan Krabbe")
+    ax.set_xlabel("Teams")
+    ax.set_ylabel("Count")
+    ax.set_title("Live Soccer Match Statistics - Ryan Krabbe")
 
     # Use the set_xticklabels() method to rotate the x-axis labels
     # Pass in the x list, specify the rotation angle is 45 degrees,
     # and align them to the right
     # ha stands for horizontal alignment
-    ax.set_xticklabels(authors_list, rotation=45, ha="right")
+    ax.set_xticks([x + bar_width for x in x_positions])
+    ax.set_xticklabels(teams, rotation=45, ha="right")
+    ax.legend()
 
     # Use the tight_layout() method to automatically adjust the padding
     plt.tight_layout()
@@ -188,6 +197,7 @@ def main() -> None:
             match_event = message.value
             logger.info(f"Received match event: {match_event}")
             process_match_event(match_event)
+            update_chart()
     except KeyboardInterrupt:
         logger.warning("Consumer interrupted by user.")
     except Exception as e:
