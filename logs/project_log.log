@@ -1218,3 +1218,37 @@
 2025-02-05 09:19:45.875 | WARNING  | __main__:main:202 - Consumer interrupted by user.
 2025-02-05 09:19:45.880 | INFO     | __main__:main:207 - Kafka consumer closed.
 2025-02-05 09:19:45.881 | INFO     | __main__:main:209 - END soccer match consumer.
+2025-02-10 16:21:42.177 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-10 16:21:42.180 | INFO     | __main__:<module>:69 - Project root: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe
+2025-02-10 16:21:42.181 | INFO     | __main__:<module>:73 - Data folder: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data
+2025-02-10 16:21:42.181 | INFO     | __main__:<module>:77 - Data file: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data\project.json
+2025-02-10 16:21:42.181 | INFO     | __main__:main:140 - START soccer match producer.
+2025-02-10 16:21:42.182 | INFO     | utils.utils_producer:get_zookeeper_address:57 - Zookeeper address: localhost:2181
+2025-02-10 16:21:42.207 | INFO     | utils.utils_producer:check_zookeeper_service_is_ready:79 - Zookeeper is ready at localhost:2181.
+2025-02-10 16:21:42.209 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-10 16:21:44.233 | ERROR    | utils.utils_producer:check_kafka_service_is_ready:102 - Error checking Kafka: NoBrokersAvailable
+2025-02-10 16:21:44.234 | ERROR    | utils.utils_producer:verify_services:121 - Kafka broker is not ready. Please check your Kafka setup. Exiting...
+2025-02-10 16:22:27.286 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-10 16:22:27.289 | INFO     | __main__:<module>:69 - Project root: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe
+2025-02-10 16:22:27.289 | INFO     | __main__:<module>:73 - Data folder: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data
+2025-02-10 16:22:27.290 | INFO     | __main__:<module>:77 - Data file: C:\Users\Ryan Krabbe\Documents\Streaming_Data\buzzline-04-krabbe\data\project.json
+2025-02-10 16:22:27.290 | INFO     | __main__:main:140 - START soccer match producer.
+2025-02-10 16:22:27.290 | INFO     | utils.utils_producer:get_zookeeper_address:57 - Zookeeper address: localhost:2181
+2025-02-10 16:22:27.297 | INFO     | utils.utils_producer:check_zookeeper_service_is_ready:79 - Zookeeper is ready at localhost:2181.
+2025-02-10 16:22:27.298 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-10 16:22:27.619 | INFO     | utils.utils_producer:check_kafka_service_is_ready:98 - Kafka is ready. Brokers: {'throttle_time_ms': 0, 'brokers': [{'node_id': 1001, 'host': 'localhost', 'port': 9092, 'rack': None}], 'cluster_id': 'pTAPmLRSTTWN7XRDwa4UDA', 'controller_id': 1001}
+2025-02-10 16:22:27.621 | INFO     | __main__:get_kafka_topic:51 - Kafka topic: soccer_matches
+2025-02-10 16:22:27.621 | INFO     | __main__:get_message_interval:58 - Message interval: 3 seconds
+2025-02-10 16:22:27.622 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-10 16:22:27.623 | INFO     | utils.utils_producer:create_kafka_producer:146 - Connecting to Kafka broker at localhost:9092...
+2025-02-10 16:22:27.729 | INFO     | utils.utils_producer:create_kafka_producer:151 - Kafka producer successfully created.
+2025-02-10 16:22:27.729 | INFO     | utils.utils_producer:get_kafka_broker_address:50 - Kafka broker address: localhost:9092
+2025-02-10 16:22:28.046 | INFO     | utils.utils_producer:create_kafka_topic:176 - Creating 'soccer_matches'.
+2025-02-10 16:22:28.197 | INFO     | utils.utils_producer:create_kafka_topic:181 - Topic 'soccer_matches' created successfully.
+2025-02-10 16:22:28.198 | INFO     | __main__:main:163 - Kafka topic 'soccer_matches' is ready.
+2025-02-10 16:22:28.198 | INFO     | __main__:main:169 - Starting soccer match production to topic 'soccer_matches'...
+2025-02-10 16:22:28.205 | INFO     | __main__:main:174 - Sent match event to topic 'soccer_matches': {'match_id': 146, 'date': '2025-02-10', 'home_team': 'Brighton', 'away_team': 'Liverpool', 'home_goals': 2, 'away_goals': 0, 'home_possession': 49, 'away_possession': 51, 'home_shots': 18, 'away_shots': 20, 'home_fouls': 6, 'away_fouls': 5}
+2025-02-10 16:22:31.208 | INFO     | __main__:main:174 - Sent match event to topic 'soccer_matches': {'match_id': 818, 'date': '2025-02-10', 'home_team': 'Arsenal', 'away_team': 'Newcastle United', 'home_goals': 2, 'away_goals': 0, 'home_possession': 50, 'away_possession': 50, 'home_shots': 6, 'away_shots': 6, 'home_fouls': 7, 'away_fouls': 10}
+2025-02-10 16:22:31.982 | WARNING  | __main__:main:177 - Producer interrupted by user.
+2025-02-10 16:22:31.984 | INFO     | __main__:main:182 - Kafka producer closed.
+2025-02-10 16:22:31.984 | INFO     | __main__:main:184 - END soccer match producer.
