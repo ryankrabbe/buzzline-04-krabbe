@@ -1627,3 +1627,24 @@
 2025-02-17 17:10:45.796 | INFO     | __main__:stream_matches:125 - Producer shutting down.
 2025-02-17 17:10:47.418 | WARNING  | __main__:main:190 - Consumer interrupted by user.
 2025-02-17 17:10:47.424 | INFO     | __main__:main:193 - Kafka consumer closed.
+2025-02-17 17:12:47.261 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-17 17:12:47.263 | INFO     | __main__:stream_matches:80 - START soccer match producer...
+2025-02-17 17:12:47.376 | INFO     | __main__:stream_matches:93 - Kafka producer connected to localhost:9092
+2025-02-17 17:12:47.377 | INFO     | __main__:stream_matches:108 - Streaming match: {'timestamp': '2025-02-17 17:12:47', 'home_team': 'Southampton', 'away_team': 'Manchester City', 'home_goals': 5, 'away_goals': 0, 'home_shots': 5, 'away_shots': 16, 'home_fouls': 12, 'away_fouls': 15, 'home_possession': 43, 'away_possession': 57, 'match_status': 'Halftime'}
+2025-02-17 17:12:47.378 | INFO     | __main__:stream_matches:113 - Sent match data to Kafka topic 'soccer_matches': {'timestamp': '2025-02-17 17:12:47', 'home_team': 'Southampton', 'away_team': 'Manchester City', 'home_goals': 5, 'away_goals': 0, 'home_shots': 5, 'away_shots': 16, 'home_fouls': 12, 'away_fouls': 15, 'home_possession': 43, 'away_possession': 57, 'match_status': 'Halftime'}
+2025-02-17 17:12:50.198 | INFO     | utils.utils_logger:<module>:38 - Logging to file: logs\project_log.log
+2025-02-17 17:12:50.408 | INFO     | __main__:main:166 - START soccer match consumer.
+2025-02-17 17:12:50.519 | INFO     | __main__:main:178 - Listening for messages on topic 'soccer_matches'...
+2025-02-17 17:12:50.834 | INFO     | __main__:main:186 - Received match event: {'timestamp': '2025-02-17 17:12:47', 'home_team': 'Southampton', 'away_team': 'Manchester City', 'home_goals': 5, 'away_goals': 0, 'home_shots': 5, 'away_shots': 16, 'home_fouls': 12, 'away_fouls': 15, 'home_possession': 43, 'away_possession': 57, 'match_status': 'Halftime'}
+2025-02-17 17:12:50.842 | INFO     | consumers.db_sqlite_krabbe:insert_match:106 - Inserted match: Southampton vs Manchester City
+2025-02-17 17:12:50.842 | INFO     | __main__:process_match_event:157 - Updated stats: Manchester City -> {'matches': 1, 'goals': 0, 'shots': 16, 'fouls': 15}
+2025-02-17 17:12:52.380 | INFO     | __main__:stream_matches:108 - Streaming match: {'timestamp': '2025-02-17 17:12:52', 'home_team': 'Newcastle', 'away_team': 'Nottingham Forest', 'home_goals': 1, 'away_goals': 1, 'home_shots': 7, 'away_shots': 4, 'home_fouls': 14, 'away_fouls': 11, 'home_possession': 53, 'away_possession': 47, 'match_status': 'Fulltime'}
+2025-02-17 17:12:52.382 | INFO     | __main__:stream_matches:113 - Sent match data to Kafka topic 'soccer_matches': {'timestamp': '2025-02-17 17:12:52', 'home_team': 'Newcastle', 'away_team': 'Nottingham Forest', 'home_goals': 1, 'away_goals': 1, 'home_shots': 7, 'away_shots': 4, 'home_fouls': 14, 'away_fouls': 11, 'home_possession': 53, 'away_possession': 47, 'match_status': 'Fulltime'}
+2025-02-17 17:12:52.384 | INFO     | __main__:main:186 - Received match event: {'timestamp': '2025-02-17 17:12:52', 'home_team': 'Newcastle', 'away_team': 'Nottingham Forest', 'home_goals': 1, 'away_goals': 1, 'home_shots': 7, 'away_shots': 4, 'home_fouls': 14, 'away_fouls': 11, 'home_possession': 53, 'away_possession': 47, 'match_status': 'Fulltime'}
+2025-02-17 17:12:52.393 | INFO     | consumers.db_sqlite_krabbe:insert_match:106 - Inserted match: Newcastle vs Nottingham Forest
+2025-02-17 17:12:52.394 | INFO     | __main__:process_match_event:157 - Updated stats: Nottingham Forest -> {'matches': 1, 'goals': 1, 'shots': 4, 'fouls': 11}
+2025-02-17 17:12:53.564 | WARNING  | __main__:stream_matches:118 - Producer interrupted by user.
+2025-02-17 17:12:53.565 | INFO     | __main__:stream_matches:124 - Kafka producer closed.
+2025-02-17 17:12:53.565 | INFO     | __main__:stream_matches:125 - Producer shutting down.
+2025-02-17 17:12:54.351 | WARNING  | __main__:main:190 - Consumer interrupted by user.
+2025-02-17 17:12:54.355 | INFO     | __main__:main:193 - Kafka consumer closed.

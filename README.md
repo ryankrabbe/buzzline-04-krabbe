@@ -1,26 +1,27 @@
-# buzzline-06-krabbe
+# soccer-project-krabbe
 
 ## Overview of my project
 
-I created a consumer named project_consumer_krabbe to visualize real time streaming data. My consumer file pulls messages from the Kafka Topic I created, which is soccer matches and then creates a bar chart to visualize the live stats from each team. My consumer that I created reads the data sent from the producer file named json_producer_case which sends the data from a json file that I created named project.json
+I created a consumer named project_consumer_krabbe to visualize real time streaming data. My consumer file pulls messages from the Kafka Topic I created, which is random soccer matches and then creates a dynamic visualization to identify performance trends over time. My consumer that I created reads the data sent from the producer file named project_producer_case which sends the data from a json file that I created named soccer_matches.json
 
 ## Visualization
-The goal for my visualization was to display the different stats for each team through a bar chart as the random matches generated.
+In it's most simple form the bar chart provides a real time view of different match statistics for different teams based on the game.
 - X-Axis - Teams
 - Y-Axis - Goals (green), Shots (blue), Fouls (red)
 
+To take my visualization to the next level I added trend analysis to identify performance trends over time. From the trend analysis different observations can be made including:
+- Team Performance Over Time
+- Momentum Indicators
+- Discipline Trends (based on fouls committed)
+
+## Storing Data in SQLite
+My soccer project takes the live streaming data from Kafka and stores it in a SQLite database that I created. I created two different tables: matches & team_stats.
+- Matches Table - The matches data takes the raw data that is being streamed and stores it inside the table
+- team_stats Table - This table stores metrics such as total goals, fouls and shots over multiple games
+
+Both of these tables help store data in a simple format and make it easier to track and analyze different match trends.
+
 We can analyze and visualize different types of streaming data as the information arrives.
-
-The producers don't change from buzzline-03-case - they write the same information to a Kafka topic, except the csv producer for the smart smoker has been modified to not run continuously. It will stop after reading all the rows in the CSV file. 
-The consumers have been enhanced to add visualization. 
-
-This project uses matplotlib and its animation capabilities for visualization. 
-
-It generates three applications:
-
-1. A basic producer and consumer that exchange information via a dynamically updated file. 
-2. A JSON producer and consumer that exchange information via a Kafka topic. 
-3. A CSV producer and consumer that exchange information via a different Kafka topic. 
 
 ## Steps below to run the Producer & Custom Consumer
 
@@ -59,7 +60,7 @@ Windows:
 
 ```shell
 .venv\Scripts\activate
-py -m producers.json_producer_case
+py -m producers.project_producer_case
 ```
 
 ### Consumer Terminal
