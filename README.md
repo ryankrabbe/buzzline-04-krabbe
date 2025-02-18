@@ -2,6 +2,8 @@
 
 ## Overview of my project
 
+The goal of my project is to analyze random soccer data from 50 English Premier League matches. I am aiming to build a database to store my data to identify different match trends as well as creating dynamic real-time visualization to identify performance trends over time.
+
 I created a consumer named project_consumer_krabbe to visualize real time streaming data. My consumer file pulls messages from the Kafka Topic I created, which is random soccer matches and then creates a dynamic visualization to identify performance trends over time. My consumer that I created reads the data sent from the producer file named project_producer_case which sends the data from a json file that I created named soccer_matches.json
 
 ## Visualization
