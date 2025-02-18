@@ -10,7 +10,7 @@ import sys
 
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).parent.parent
-sys.path.append(str(PROJECT_ROOT / "consumers"))
+sys.path.append(str(PROJECT_ROOT))
 
 from utils.utils_logger import logger
 
