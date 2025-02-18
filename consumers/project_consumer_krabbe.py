@@ -1,32 +1,16 @@
-"""
-project_consumer_krabbe.py
-
-Consume json messages from a Kafka topic and visualize author counts in real-time.
-
-JSON is a set of key:value pairs. 
-
-Example serialized Kafka message
-"{\"message\": \"I love Python!\", \"author\": \"Eve\"}"
-
-Example JSON message (after deserialization) to be analyzed
-{"message": "I love Python!", "author": "Eve"}
-
-"""
-
-#####################################
-# Import Modules
-#####################################
-
-# Import packages from Python Standard Library
+# Import modules
+import json
 import os
-import json  # handle JSON parsing
-import collections
-from collections import defaultdict  # data structure for counting author occurrences
 import sys
-
-# Import external packages
-from dotenv import load_dotenv
+import numpy as np
+from collections import deque
+from pathlib import Path
+import collections
+import matplotlib.pyplot as plt
 from kafka import KafkaConsumer
+from dotenv import load_dotenv
+from datetime import datetime
+from utils.utils_logger import logger
 
 # IMPORTANT
 # Import Matplotlib.pyplot for live plotting
@@ -38,6 +22,13 @@ import matplotlib.pyplot as plt
 from utils.utils_consumer import create_kafka_consumer
 from utils.utils_logger import logger
 
+# Ensure `consumers/` is in sys.path
+PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.append(str(PROJECT_ROOT))
+sys.path.append(str(PROJECT_ROOT / "consumers"))
+
+from consumers.db_sqlite_krabbe import insert_match, update_team_stats
+
 #####################################
 # Load Environment Variables
 #####################################
@@ -48,40 +39,17 @@ load_dotenv()
 # Getter Functions for .env Variables
 #####################################
 
-
 def get_kafka_topic() -> str:
-    """Fetch Kafka topic from environment or use default."""
-    topic = os.getenv("SOCCER_MATCH_TOPIC", "soccer_matches")
-    logger.info(f"Kafka topic: {topic}")
-    return topic
-
+    return os.getenv("PROJECT_TOPIC", "soccer_matches")
 
 def get_kafka_group_id() -> str:
-    """Fetch Kafka consumer group id from environment or use default."""
-    group_id: str = os.getenv("SOCCER_CONSUMER_GROUP", "soccer_group_1")
-    logger.info(f"Kafka consumer group id: {group_id}")
-    return group_id
-
-
-#####################################
-# Set up data structures
-#####################################
-
-# Initialize a dictionary to store author counts
-author_counts = defaultdict(int)
+    return os.getenv("SOCCER_CONSUMER_GROUP", "soccer_group_1")
 
 #####################################
 # Set up live visuals
 match_stats = collections.defaultdict(lambda: {"matches": 0, "goals": 0, "shots": 0, "fouls": 0})
 
-# Use the subplots() method to create a tuple containing
-# two objects at once:
-# - a figure (which can have many axis)
-# - an axis (what they call a chart in Matplotlib)
 fig, ax = plt.subplots()
-
-# Use the ion() method (stands for "interactive on")
-# to turn on interactive mode for live updates
 plt.ion()
 
 #####################################
@@ -89,47 +57,57 @@ plt.ion()
 # This will get called every time a new message is processed
 #####################################
 
+MATCH_HISTORY_LIMIT = 5
+team_history = collections.defaultdict(lambda: {"goals": deque(maxlen=MATCH_HISTORY_LIMIT),
+                                                "shots": deque(maxlen=MATCH_HISTORY_LIMIT),
+                                                "fouls": deque(maxlen=MATCH_HISTORY_LIMIT)})
 
 def update_chart():
-    """Update the live chart with the latest author counts."""
-    # Clear the previous chart
+    """Update the live statistics chart."""
     ax.clear()
 
-    # Get the teams and counts from the dictionary
-    teams = list(match_stats.keys())
-    goals = [match_stats[team]["goals"] for team in teams]
-    shots = [match_stats[team]["shots"] for team in teams]
-    fouls = [match_stats[team]["fouls"] for team in teams]
+    teams_sorted = sorted(match_stats.keys(), key=lambda x: match_stats[x]["goals"], reverse=True)
+    goals = [match_stats[team]["goals"] for team in teams_sorted]
+    shots = [match_stats[team]["shots"] for team in teams_sorted]
+    fouls = [match_stats[team]["fouls"] for team in teams_sorted]
+
+    # Update moving averages
+    moving_avg_goals = []
+    moving_avg_shots = []
+    moving_avg_fouls = []
+
+    for team in teams_sorted:
+        team_history[team]["goals"].append(match_stats[team]["goals"])
+        team_history[team]["shots"].append(match_stats[team]["shots"])
+        team_history[team]["fouls"].append(match_stats[team]["fouls"])
+
+        moving_avg_goals.append(np.mean(team_history[team]["goals"]))
+        moving_avg_shots.append(np.mean(team_history[team]["shots"]))
+        moving_avg_fouls.append(np.mean(team_history[team]["fouls"]))
 
     bar_width = 0.25
-    x_positions = range(len(teams))
+    x_positions = np.arange(len(teams_sorted))
 
-    # Create a bar chart using the bar() method.
-    # Pass in the x list, the y list, and the color
-    ax.bar(x_positions, goals, width=bar_width, label="Goals", color="green")
-    ax.bar([x + bar_width for x in x_positions], shots, width=bar_width, label="Shots", color="blue")
-    ax.bar([x + 2 * bar_width for x in x_positions], fouls, width=bar_width, label="Fouls", color="red")
+    # Bar Chart for Current Stats
+    ax.bar(x_positions, goals, width=bar_width, label="Goals", color="#2E86C1", alpha=0.9)
+    ax.bar(x_positions + bar_width, shots, width=bar_width, label="Shots", color="#28B463", alpha=0.8)
+    ax.bar(x_positions + 2 * bar_width, fouls, width=bar_width, label="Fouls", color="#E74C3C", alpha=0.8)
 
-    # Use the built-in axes methods to set the labels and title
-    ax.set_xlabel("Teams")
-    ax.set_ylabel("Count")
-    ax.set_title("Live Soccer Match Statistics - Ryan Krabbe")
+    # Overlay Line Chart for Moving Averages
+    ax.plot(x_positions, moving_avg_goals, marker="o", linestyle="-", color="#1F618D", label="Avg Goals", linewidth=2)
+    ax.plot(x_positions, moving_avg_shots, marker="o", linestyle="-", color="#117A65", label="Avg Shots", linewidth=2)
+    ax.plot(x_positions, moving_avg_fouls, marker="o", linestyle="-", color="#943126", label="Avg Fouls", linewidth=2)
 
-    # Use the set_xticklabels() method to rotate the x-axis labels
-    # Pass in the x list, specify the rotation angle is 45 degrees,
-    # and align them to the right
-    # ha stands for horizontal alignment
-    ax.set_xticks([x + bar_width for x in x_positions])
-    ax.set_xticklabels(teams, rotation=45, ha="right")
-    ax.legend()
+    ax.set_xlabel("Teams", fontsize=12, fontweight='bold')
+    ax.set_ylabel("Count", fontsize=12, fontweight='bold')
+    ax.set_title("Live Soccer Match Statistics - Ryan Krabbe", fontsize=14, fontweight='bold')
+    ax.set_xticks(x_positions + bar_width)
+    ax.set_xticklabels(teams_sorted, rotation=45, ha="right", fontsize=10)
+    ax.legend(fontsize=10)
+    ax.grid(axis="y", linestyle="--", alpha=0.7)
 
-    # Use the tight_layout() method to automatically adjust the padding
     plt.tight_layout()
-
-    # Draw the chart
     plt.draw()
-
-    # Pause briefly to allow some time for the chart to render
     plt.pause(0.01)
 
 
@@ -141,17 +119,35 @@ def update_chart():
 def process_match_event(match_event):
     """
     Process an incoming soccer match event.
-
-    Args:
-        match_event (dict): The match event data.
     """
     home_team = match_event["home_team"]
     away_team = match_event["away_team"]
+    home_goals = match_event["home_goals"]
+    away_goals = match_event["away_goals"]
+    home_shots = match_event["home_shots"]
+    away_shots = match_event["away_shots"]
+    home_fouls = match_event["home_fouls"]
+    away_fouls = match_event["away_fouls"]
 
-    # Update stats for both teams
+    # Store match data in SQLite
+    match_data = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "home_team": home_team,
+        "away_team": away_team,
+        "home_goals": home_goals,
+        "away_goals": away_goals,
+        "home_shots": home_shots,
+        "away_shots": away_shots,
+        "home_fouls": home_fouls,
+        "away_fouls": away_fouls
+    }
+
+    insert_match(match_data)  # ✅ Correct function call
+
+    # Update live stats visualization
     for team, goals, shots, fouls in [
-        (home_team, match_event["home_goals"], match_event["home_shots"], match_event["home_fouls"]),
-        (away_team, match_event["away_goals"], match_event["away_shots"], match_event["away_fouls"]),
+        (home_team, home_goals, home_shots, home_fouls),
+        (away_team, away_goals, away_shots, away_fouls),
     ]:
         match_stats[team]["matches"] += 1
         match_stats[team]["goals"] += goals
@@ -166,20 +162,12 @@ def process_match_event(match_event):
 #####################################
 
 
-def main() -> None:
-    """
-    Main entry point for the consumer.
-
-    - Listens for soccer match messages from Kafka.
-    - Processes the match events in real-time.
-    """
+def main():
     logger.info("START soccer match consumer.")
 
-    # fetch .env content
     topic = get_kafka_topic()
     group_id = get_kafka_group_id()
 
-    # Create the Kafka consumer
     try:
         consumer = KafkaConsumer(
             topic,
@@ -200,18 +188,9 @@ def main() -> None:
             update_chart()
     except KeyboardInterrupt:
         logger.warning("Consumer interrupted by user.")
-    except Exception as e:
-        logger.error(f"Error during message consumption: {e}")
     finally:
         consumer.close()
         logger.info("Kafka consumer closed.")
-
-    logger.info("END soccer match consumer.")
-
-
-#####################################
-# Conditional Execution
-#####################################
 
 if __name__ == "__main__":
     main()

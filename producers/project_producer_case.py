@@ -1,20 +1,9 @@
 """
 project_producer_case.py
 
-Stream JSON data to a file and - if available - a Kafka topic.
-
-Example JSON message
-{
-    "message": "I just shared a meme! It was amazing.",
-    "author": "Charlie",
-    "timestamp": "2025-01-29 14:35:20",
-    "category": "humor",
-    "sentiment": 0.87,
-    "keyword_mentioned": "meme",
-    "message_length": 42
-}
-
+Stream JSON soccer match data from a file to Kafka.
 """
+
 #####################################
 # Import Modules
 #####################################
@@ -44,39 +33,14 @@ from utils.utils_logger import logger
 load_dotenv()
 
 #####################################
-# Define Constants and Keyword Categories
-#####################################
-
-KEYWORD_CATEGORIES = {
-    "meme": "humor",
-    "Python": "tech",
-    "JavaScript": "tech",
-    "recipe": "food",
-    "travel": "travel",
-    "movie": "entertainment",
-    "game": "gaming",
-}
-
-#####################################
-# Stub Sentiment Analysis Function
-#####################################
-
-def assess_sentiment(text: str) -> float:
-    """
-    Stub for sentiment analysis.
-    Returns a random float between 0 and 1 for now.
-    """
-    return round(random.uniform(0, 1), 2)
-
-#####################################
 # Getter Functions for Environment Variables
 #####################################
 
 def get_message_interval() -> int:
-    return int(os.getenv("PROJECT_INTERVAL_SECONDS", 1))
+    return int(os.getenv("PROJECT_INTERVAL_SECONDS", 5))  # Default to 5 seconds
 
 def get_kafka_topic() -> str:
-    return os.getenv("PROJECT_TOPIC", "buzzline-topic")
+    return os.getenv("PROJECT_TOPIC", "soccer_matches")
 
 def get_kafka_server() -> str:
     return os.getenv("KAFKA_SERVER", "localhost:9092")
@@ -87,59 +51,37 @@ def get_kafka_server() -> str:
 
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent
 DATA_FOLDER = PROJECT_ROOT.joinpath("data")
-DATA_FILE = DATA_FOLDER.joinpath("project_live.json")
+MATCHES_FILE = DATA_FOLDER.joinpath("soccer_matches.json")
 
 #####################################
-# Define Message Generator
+# Load Match Data
 #####################################
 
-def generate_messages():
+def load_matches():
     """
-    Generate a stream of JSON messages.
+    Load match data from the JSON file.
     """
-    ADJECTIVES = ["amazing", "funny", "boring", "exciting", "weird"]
-    ACTIONS = ["found", "saw", "tried", "shared", "loved"]
-    TOPICS = ["a movie", "a meme", "an app", "a trick", "a story", "Python", "JavaScript", "recipe", "travel", "game"]
-    AUTHORS = ["Alice", "Bob", "Charlie", "Eve"]
-    
-    while True:
-        adjective = random.choice(ADJECTIVES)
-        action = random.choice(ACTIONS)
-        topic = random.choice(TOPICS)
-        author = random.choice(AUTHORS)
-        message_text = f"I just {action} {topic}! It was {adjective}."
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Find category based on keywords
-        keyword_mentioned = next((word for word in KEYWORD_CATEGORIES if word in topic), "other")
-        category = KEYWORD_CATEGORIES.get(keyword_mentioned, "other")
-        
-        # Assess sentiment
-        sentiment = assess_sentiment(message_text)
-        
-        # Create JSON message
-        json_message = {
-            "message": message_text,
-            "author": author,
-            "timestamp": timestamp,
-            "category": category,
-            "sentiment": sentiment,
-            "keyword_mentioned": keyword_mentioned,
-            "message_length": len(message_text)
-        }
-        
-        yield json_message
+    try:
+        with MATCHES_FILE.open("r") as f:
+            matches = json.load(f)
+        return matches
+    except Exception as e:
+        logger.error(f"Error loading match data: {e}")
+        return []
 
 #####################################
-# Main Function
+# Main Function to Stream Data
 #####################################
 
-def main():
-    logger.info("START producer...")
+def stream_matches():
+    """
+    Read soccer matches from a file and stream to Kafka.
+    """
+    logger.info("START soccer match producer...")
     interval_secs = get_message_interval()
     topic = get_kafka_topic()
     kafka_server = get_kafka_server()
-    
+
     # Attempt to create Kafka producer
     producer = None
     if KAFKA_AVAILABLE:
@@ -152,21 +94,26 @@ def main():
         except Exception as e:
             logger.error(f"Kafka connection failed: {e}")
             producer = None
-    
+
+    matches = load_matches()
+    if not matches:
+        logger.error("No matches found in the file.")
+        return
+
     try:
-        for message in generate_messages():
-            logger.info(message)
-            
-            # Write to file
-            with DATA_FILE.open("a") as f:
-                f.write(json.dumps(message) + "\n")
-            
-            # Send to Kafka if available
-            if producer:
-                producer.send(topic, value=message)
-                logger.info(f"Sent message to Kafka topic '{topic}': {message}")
-            
-            time.sleep(interval_secs)
+        while True:
+            for match in matches:
+                match["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                logger.info(f"Streaming match: {match}")
+
+                # Send match to Kafka
+                if producer:
+                    producer.send(topic, value=match)
+                    logger.info(f"Sent match data to Kafka topic '{topic}': {match}")
+
+                time.sleep(interval_secs)  # Stream a match every X seconds
+
     except KeyboardInterrupt:
         logger.warning("Producer interrupted by user.")
     except Exception as e:
@@ -182,4 +129,4 @@ def main():
 #####################################
 
 if __name__ == "__main__":
-    main()
+    stream_matches()
