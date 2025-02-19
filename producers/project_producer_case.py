@@ -37,7 +37,7 @@ load_dotenv()
 #####################################
 
 def get_message_interval() -> int:
-    return int(os.getenv("PROJECT_INTERVAL_SECONDS", 5))  # Default to 5 seconds
+    return int(os.getenv("PROJECT_INTERVAL_SECONDS", 5))
 
 def get_kafka_topic() -> str:
     return os.getenv("PROJECT_TOPIC", "soccer_matches")
@@ -112,7 +112,7 @@ def stream_matches():
                     producer.send(topic, value=match)
                     logger.info(f"Sent match data to Kafka topic '{topic}': {match}")
 
-                time.sleep(interval_secs)  # Stream a match every X seconds
+                time.sleep(interval_secs)
 
     except KeyboardInterrupt:
         logger.warning("Producer interrupted by user.")

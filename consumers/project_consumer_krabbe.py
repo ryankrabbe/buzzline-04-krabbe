@@ -54,7 +54,6 @@ plt.ion()
 
 #####################################
 # Define an update chart function for live plotting
-# This will get called every time a new message is processed
 #####################################
 
 MATCH_HISTORY_LIMIT = 5
@@ -142,7 +141,7 @@ def process_match_event(match_event):
         "away_fouls": away_fouls
     }
 
-    insert_match(match_data)  # ✅ Correct function call
+    insert_match(match_data)
 
     # Update live stats visualization
     for team, goals, shots, fouls in [
