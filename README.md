@@ -7,14 +7,17 @@ The goal of my project is to analyze random soccer data from 50 English Premier 
 I created a consumer named project_consumer_krabbe to visualize real time streaming data. My consumer file pulls messages from the Kafka Topic I created, which is random soccer matches and then creates a dynamic visualization to identify performance trends over time. My consumer that I created reads the data sent from the producer file named project_producer_case which sends the data from a json file that I created named soccer_matches.json
 
 ## Visualization
-In it's most simple form the bar chart provides a real time view of different match statistics for different teams based on the game.
+In it's most simple form the bar chart provides a real time view of different match statistics for different teams based on the game. I used matplotlib for my visualizations and implemented numpy for trend analysis.
 - X-Axis - Teams
 - Y-Axis - Goals (green), Shots (blue), Fouls (red)
 
-To take my visualization to the next level I added trend analysis to identify performance trends over time. From the trend analysis different observations can be made including:
+To take my visualization to the next level I added trend analysis using to identify performance trends over time. From the trend analysis different observations can be made including:
 - Team Performance Over Time
 - Momentum Indicators
 - Discipline Trends (based on fouls committed)
+
+Below is a screenshot of my figure offering a real time view of different match statistics including trend analysis.
+![Real Time Visualization](Screenshot_2025-02-18_143408.png)
 
 ## Storing Data in SQLite
 My soccer project takes the live streaming data from Kafka and stores it in a SQLite database that I created. I created two different tables: matches & team_stats.
@@ -25,7 +28,7 @@ Both of these tables help store data in a simple format and make it easier to tr
 
 We can analyze and visualize different types of streaming data as the information arrives.
 
-## Steps below to run the Producer & Custom Consumer
+### Follow the steps below to run the Producer & Custom Consumer on your own!
 
 ## Task 3. Manage Local Project Virtual Environment
 
