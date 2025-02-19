@@ -17,7 +17,7 @@ To take my visualization to the next level I added trend analysis using to ident
 - Discipline Trends (based on fouls committed)
 
 Below is a screenshot of my figure offering a real time view of different match statistics including trend analysis.
-![Real Time Visualization](Screenshot_2025-02-18_143408.png)
+![Real Time Visualization](assets/Screenshot_2025-02-18_143408.png)
 
 ## Storing Data in SQLite
 My soccer project takes the live streaming data from Kafka and stores it in a SQLite database that I created. I created two different tables: matches & team_stats.
